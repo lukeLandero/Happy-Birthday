@@ -38,6 +38,62 @@
       color: var(--text-color);
     }
     
+    /* ========== COUNTDOWN STYLES ========== */
+    #countdownContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 5000;
+      background: rgba(0, 0, 0, 0.7);
+    }
+    
+    .countdown-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .countdown-number {
+      font-family: var(--font-heading);
+      font-size: clamp(8rem, 20vw, 15rem);
+      color: white;
+      text-shadow: 
+        0 0 30px rgba(255,255,255,1),
+        0 0 60px rgba(255,255,255,0.8),
+        0 0 90px rgba(255,105,180,1),
+        0 0 120px rgba(255,20,147,0.8),
+        5px 5px 15px rgba(0,0,0,0.7);
+      opacity: 0;
+      transform: scale(0.5);
+      z-index: 2;
+    }
+    
+    .countdown-message {
+      font-family: var(--font-body);
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      color: white;
+      text-shadow: 0 0 10px rgba(255,255,255,0.8);
+      margin-top: 20px;
+      opacity: 0;
+      z-index: 2;
+    }
+    
+    .countdown-circle {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border: 8px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      z-index: 1;
+    }
+    
     /* ========== GIFT BOX STYLES ========== */
     #giftBox {
       position: fixed;
@@ -338,7 +394,7 @@
     
     .decoration {
       position: absolute;
-      width: 16px;
+      width:16px;
       height: 16px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #ff69b4, #ff1493);
@@ -686,6 +742,15 @@
   </style>
 </head>
 <body>
+  <!-- COUNTDOWN CONTAINER -->
+  <div id="countdownContainer">
+    <div class="countdown-wrapper">
+      <div class="countdown-circle"></div>
+      <div class="countdown-number">3</div>
+      <div class="countdown-message">Prepárate para la magia...</div>
+    </div>
+  </div>
+
   <!-- GIFT BOX -->
   <div id="giftBox">
     <div class="gift-wrapper">
@@ -751,8 +816,8 @@
     
     <!-- BUTTONS -->
     <div class="button-container">
-      <button id="btnOpenLetter" class="btn">Leer Mensaje 📜</button>
-      <button id="btnMakeWish" class="btn">Pide un Deseo 🌟💫💫</button>
+      <button id="btnOpenLetter" class="btn">Leer Mensaje 💌</button>
+      <button id="btnMakeWish" class="btn">Pide un Deseo 🌟</button>
     </div>
   </div>
   
@@ -794,6 +859,7 @@ Luke`;
     const btnMakeWish = document.getElementById('btnMakeWish');
     const letterModal = document.getElementById('letterModal');
     const letterText = document.getElementById('letterText');
+    const countdownContainer = document.getElementById('countdownContainer');
     
     let isGiftOpened = false;
     let candlesBlown = false;
@@ -817,7 +883,7 @@ Luke`;
         ease: 'back.in'
       });
 
-      // Pop the lid open AND launch confetti + balloons FROM THE GIFT BOX
+      // Pop lid open AND launch confetti + balloons FROM THE GIFT BOX
       setTimeout(() => {
         gsap.to(lid, {
           y: -150,
@@ -827,12 +893,12 @@ Luke`;
           ease: 'power2.out'
         });
         
-        // BURST confetti and balloons from the center!
+        // BURST confetti and balloons from center!
         launchConfettiFromCenter();
         launchBalloonsFromCenter();
       }, 300);
 
-      // Hide the entire gift box
+      // Hide entire gift box
       setTimeout(() => {
         gsap.to(giftBox, {
           scale: 0,
@@ -971,7 +1037,6 @@ Luke`;
         balloon.style.left = '50%';
         balloon.style.top = '50%';
         balloon.style.transform = 'translate(-50%, -50%)';
-        
         balloon.style.background = `radial-gradient(circle at 30% 30%, ${colors[Math.floor(Math.random() * colors.length)]}, ${colors[Math.floor(Math.random() * colors.length)]})`;
         document.body.appendChild(balloon);
         
@@ -1130,10 +1195,95 @@ Luke`;
         }
       });
       
-      // Wait 4 seconds then start fireworks
+      // Wait 4 seconds then start countdown
       setTimeout(() => {
-        startFireworks();
+        startCountdown();
       }, 4000);
+    }
+    
+    // ========== COUNTDOWN (FIXED) ==========
+    function startCountdown() {
+      countdownContainer.style.display = 'flex';
+      let count = 3;
+      const countdownNumber = document.querySelector('.countdown-number');
+      const countdownMessage = document.querySelector('.countdown-message');
+      const countdownCircle = document.querySelector('.countdown-circle');
+      
+      // Messages for each countdown number
+      const messages = [
+        "Prepárate para la magia...",
+        "Algo especial está por suceder...",
+        "¡Cierra los ojos y haz tu deseo!"
+      ];
+      
+      function showNumber(num) {
+        // Reset animations
+        gsap.set(countdownNumber, {opacity: 0, scale: 0.5});
+        gsap.set(countdownMessage, {opacity: 0, y: 20});
+        gsap.set(countdownCircle, {opacity: 0, scale: 0.5});
+        
+        // Update content
+        countdownNumber.textContent = num;
+        countdownMessage.textContent = messages[3 - num];
+        
+        // Animate in
+        gsap.to(countdownNumber, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: 'back.out'
+        });
+        
+        gsap.to(countdownMessage, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          delay: 0.2,
+          ease: 'power2.out'
+        });
+        
+        gsap.to(countdownCircle, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: 'power2.out'
+        });
+        
+        // Animate out - increased duration to slow down countdown
+        setTimeout(() => {
+          gsap.to(countdownNumber, {
+            opacity: 0,
+            scale: 1.5,
+            duration: 0.5,
+            ease: 'power2.in'
+          });
+          
+          gsap.to(countdownMessage, {
+            opacity: 0,
+            duration: 0.5,
+            ease: 'power2.in'
+          });
+          
+          gsap.to(countdownCircle, {
+            opacity: 0,
+            scale: 1.2,
+            duration: 0.5,
+            ease: 'power2.in',
+            onComplete: () => {
+              // Continue countdown or start fireworks
+              if (num > 1) {
+                showNumber(num - 1);
+              } else {
+                countdownContainer.style.display = 'none';
+                startFireworks();
+              }
+            }
+          });
+        }, 1500); // Increased from 800 to 1500 to slow down countdown
+      }
+      
+      // Start countdown
+      showNumber(count);
     }
     
     // ========== FIREWORKS ==========
@@ -1355,7 +1505,7 @@ Luke`;
       fireworksDuration = ms;
       showText = false;
       
-      // Start the animation loop
+      // Start animation loop
       animateFireworks();
     }
     
